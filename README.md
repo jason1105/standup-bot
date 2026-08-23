@@ -10,7 +10,7 @@ In your repository: **Settings → Secrets and variables → Actions → New rep
 
 | Secret | Value |
 |---|---|
-| `ANTHROPIC_API_KEY` | Your key from [console.anthropic.com](https://console.anthropic.com) |
+| `OPENROUTER_API_KEY` | Your key from [openrouter.ai/keys](https://openrouter.ai/keys) |
 | `GH_USERNAME` | Your GitHub username (e.g. `lvwei`) |
 
 `GITHUB_TOKEN` is provided automatically by Actions.
@@ -58,4 +58,4 @@ standup-bot/
 
 ## Customizing the Claude prompt
 
-Edit the `prompt` variable in the workflow's Python script to change the standup format, language, or length. The default uses `claude-opus-4-5` — change `model` to `claude-haiku-4-5` for faster/cheaper generation.
+Edit the `prompt` variable in the workflow's Python script to change the standup format, language, or length. The model is read from the `OPENROUTER_MODEL` repository variable (default `deepseek/deepseek-chat`) — no code change needed to switch.
