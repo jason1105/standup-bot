@@ -28,7 +28,8 @@ jobs:
       - name: Generate standup
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
           GH_USERNAME: ${{ secrets.GH_USERNAME }}
         run: |
           python - <<'PYEOF'
@@ -39,7 +40,8 @@ jobs:
 
           # ── Config ──────────────────────────────────────────────────────────
           GITHUB_TOKEN    = os.environ["GITHUB_TOKEN"]
-          ANTHROPIC_KEY   = os.environ["ANTHROPIC_API_KEY"]
+          OPENROUTER_KEY  = os.environ["OPENROUTER_API_KEY"]
+          MODEL           = os.environ.get("OPENROUTER_MODEL") or "deepseek/deepseek-chat"
           GH_USERNAME     = os.environ.get("GH_USERNAME", "").strip()
           TODAY           = datetime.now(timezone.utc).strftime("%Y-%m-%d")
           SINCE           = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
@@ -54,14 +56,13 @@ jobs:
               with urllib.request.urlopen(req, timeout=20) as r:
                   return json.loads(r.read())
 
-          def anthropic_post(payload):
+          def llm_post(payload):
               data = json.dumps(payload).encode()
               req = urllib.request.Request(
-                  "https://api.anthropic.com/v1/messages",
+                  "https://openrouter.ai/api/v1/chat/completions",
                   data=data,
                   headers={
-                      "x-api-key": ANTHROPIC_KEY,
-                      "anthropic-version": "2023-06-01",
+                      "Authorization": f"Bearer {OPENROUTER_KEY}",
                       "content-type": "application/json",
                   },
                   method="POST",
@@ -127,14 +128,14 @@ jobs:
           )
 
           try:
-              resp = anthropic_post({
-                  "model": "claude-opus-4-5",
+              resp = llm_post({
+                  "model": MODEL,
                   "max_tokens": 512,
                   "messages": [{"role": "user", "content": prompt}],
               })
-              standup_body = resp["content"][0]["text"].strip()
+              standup_body = resp["choices"][0]["message"]["content"].strip()
           except Exception as ex:
-              print(f"Warning: Claude API error: {ex}")
+              print(f"Warning: OpenRouter error: {ex}")
               standup_body = (
                   "**【昨日完成】**\n"
                   + events_text + "\n\n"
