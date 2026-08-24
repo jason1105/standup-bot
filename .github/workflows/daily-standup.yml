@@ -30,7 +30,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
-          GH_USERNAME: ${{ secrets.GH_USERNAME }}
+          # 优先用 secret，未配置时回退到仓库 owner（避免用 GITHUB_TOKEN 调 /user 触发 403）
+          GH_USERNAME: ${{ secrets.GH_USERNAME || github.repository_owner }}
         run: |
           python - <<'PYEOF'
           import os, json, re, sys
