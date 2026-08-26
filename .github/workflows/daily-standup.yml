@@ -29,6 +29,10 @@ jobs:
       - name: Generate standup
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_BASE_URL: ${{ vars.LLM_BASE_URL }}
+          LLM_MODEL: ${{ vars.LLM_MODEL }}
+          # 过渡期保留 OpenRouter 兜底，切稳后可删
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
           # 优先用 secret，未配置时回退到仓库 owner（避免用 GITHUB_TOKEN 调 /user 触发 403）
@@ -42,8 +46,9 @@ jobs:
 
           # ── Config ──────────────────────────────────────────────────────────
           GITHUB_TOKEN    = os.environ["GITHUB_TOKEN"]
-          OPENROUTER_KEY  = os.environ["OPENROUTER_API_KEY"]
-          MODEL           = os.environ.get("OPENROUTER_MODEL") or "deepseek/deepseek-chat"
+          OPENROUTER_KEY  = os.environ.get("LLM_API_KEY") or os.environ.get("OPENROUTER_API_KEY", "")
+          LLM_BASE_URL    = (os.environ.get("LLM_BASE_URL") or "https://api.deepseek.com").rstrip("/")
+          MODEL           = os.environ.get("LLM_MODEL") or os.environ.get("OPENROUTER_MODEL") or "deepseek-v4-flash"
           GH_USERNAME     = os.environ.get("GH_USERNAME", "").strip()
           TODAY           = datetime.now(timezone.utc).strftime("%Y-%m-%d")
           SINCE           = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
@@ -61,7 +66,7 @@ jobs:
           def llm_post(payload):
               data = json.dumps(payload).encode()
               req = urllib.request.Request(
-                  "https://openrouter.ai/api/v1/chat/completions",
+                  LLM_BASE_URL + "/chat/completions",
                   data=data,
                   headers={
                       "Authorization": f"Bearer {OPENROUTER_KEY}",
