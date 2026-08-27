@@ -110,6 +110,14 @@ except Exception as ex:
         "**【阻碍事项】**\n- 无"
     )
 
+# 空响应也走兜底模板（避免写出空白站会）
+if not standup_body.strip():
+    standup_body = (
+        "**【昨日完成】**\n" + events_text + "\n\n"
+        "**【今日计划】**\n- 待定\n\n"
+        "**【阻碍事项】**\n- 无"
+    )
+
 # ── Write standup file ────────────────────────────────────────────
 standup_md = f"# 每日站会 - {TODAY}\n\n{standup_body}\n"
 out_path = Path(f"standups/{TODAY}.md")
