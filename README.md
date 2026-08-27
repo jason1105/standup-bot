@@ -10,7 +10,7 @@ In your repository: **Settings → Secrets and variables → Actions → New rep
 
 | Secret | Value |
 |---|---|
-| `OPENROUTER_API_KEY` | Your key from [openrouter.ai/keys](https://openrouter.ai/keys) |
+| `LLM_API_KEY` | Your DeepSeek key from [platform.deepseek.com](https://platform.deepseek.com) (`OPENROUTER_API_KEY` also accepted) |
 | `GH_USERNAME` | Your GitHub username (e.g. `lvwei`) |
 
 `GITHUB_TOKEN` is provided automatically by Actions.
@@ -58,4 +58,4 @@ standup-bot/
 
 ## Customizing the Claude prompt
 
-Edit the `prompt` variable in the workflow's Python script to change the standup format, language, or length. The model is read from the `OPENROUTER_MODEL` repository variable (default `deepseek/deepseek-chat`) — no code change needed to switch.
+Edit the `prompt` variable in the workflow's Python script to change the standup format, language, or length. The model is read from the `LLM_MODEL` repository variable (default `deepseek-v4-flash`) — no code change needed to switch.
